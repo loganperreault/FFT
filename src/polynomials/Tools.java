@@ -25,4 +25,20 @@ public class Tools {
 		System.out.println("]");
 	}
 	
+	public static Complex round(Complex value, int decimal) {
+		double real = value.getReal();
+		double imaginary = value.getImaginary();
+		return new Complex(round(real, decimal), round(imaginary, decimal));
+	}
+	
+	public static double round(double value, int decimal) {
+		int factor = (int) Math.pow(10, decimal);
+		return (double)Math.round(value * factor) / factor;
+	}
+	
+	public static void pad(int padding) {
+		for (int i = 0; i < padding; i++)
+			System.out.print(" ");
+	}
+	
 }
