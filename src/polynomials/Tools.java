@@ -41,4 +41,46 @@ public class Tools {
 			System.out.print(" ");
 	}
 	
+	public static Complex[] toComplex(double[] vector) {
+		Complex[] complex = new Complex[vector.length];
+		for (int i = 0; i < vector.length; i++)
+			complex[i] = new Complex(vector[i]);
+		return complex;
+	}
+	
+	public static Complex[] toComplex(int[] vector) {
+		Complex[] complex = new Complex[vector.length];
+		for (int i = 0; i < vector.length; i++)
+			complex[i] = new Complex(vector[i]);
+		return complex;
+	}
+	
+	public static double[] toDouble(Complex[] vector) {
+		double[] primitive = new double[vector.length];
+		for (int i = 0; i < vector.length; i++)
+			primitive[i] = vector[i].getReal();
+		return primitive;
+	}
+	
+	public static int[] toInteger(Complex[] vector) {
+		int[] primitive = new int[vector.length];
+		for (int i = 0; i < vector.length; i++)
+			primitive[i] = (int) vector[i].getReal();
+		return primitive;
+	}
+	
+	public static double[] toDouble(int[] vector) {
+		double[] primitive = new double[vector.length];
+		for (int i = 0; i < vector.length; i++)
+			primitive[i] = vector[i];
+		return primitive;
+	}
+	
+	public static int[] toInteger(double[] vector) {
+		int[] primitive = new int[vector.length];
+		for (int i = 0; i < vector.length; i++)
+			primitive[i] = (int) vector[i];
+		return primitive;
+	}
+	
 }
