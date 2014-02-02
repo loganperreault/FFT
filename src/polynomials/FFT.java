@@ -58,8 +58,8 @@ public class FFT {
 			y[k + halfDown] = y0[k].subtract(omega.multiply(y1[k]));
 			if (inverse) {
 				if (n == 4) {
-					System.out.println(y[k]+" --> "+y[k].divide(halfDown));
-					System.out.println(y[k + halfDown]+" ==> "+y[k + halfDown].divide(halfDown));
+//					System.out.println(y[k]+" --> "+y[k].divide(halfDown));
+//					System.out.println(y[k + halfDown]+" ==> "+y[k + halfDown].divide(halfDown));
 				}
 				y[k] = y[k].divide(n);
 				y[k + halfDown] = y[k + halfDown].divide(n);
@@ -104,6 +104,7 @@ public class FFT {
 	
 	private static Complex[] transform(Complex[] vector, boolean inverse) {
 		
+		/*
 		// find the smallest power of two that will contain the resulting vector
 		int exp = 1;
 		//while (Math.pow(2, exp) < vector.length * 2)
@@ -111,14 +112,19 @@ public class FFT {
 			exp++;
 		// pad the vector with zeros
 		Complex[] a = new Complex[(int)Math.pow(2, exp)];
-		for (int i = 0; i < vector.length; i++) {
-			a[a.length - vector.length + i] = vector[i];
+		for (int i = 0; i < a.length; i++) {
+			if (i < a.length - vector.length)
+				a[i] = new Complex(0);
+			else
+				a[i] = vector[a.length - i - 1];
 		}
+		Tools.printVector(a);
 		
 		if (echo == 2)
 			Tools.printVector(a);
+		*/
 		
-		return fft(a, inverse, 0);
+		return fft(vector, inverse, 0);
 	}
 	
 	public static Complex[] transform(double[] vector) {
