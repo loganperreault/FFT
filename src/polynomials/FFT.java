@@ -5,9 +5,9 @@ import org.apache.commons.math3.complex.Complex;
 public class FFT {
 	
 	private static int padding = 4;
-	private static int echo = 3;
+	private static int echo = 1;
 	
-	private static Complex[] fft(Complex[] a, int level) {
+	private static Complex[] fft(Complex[] a, boolean inverse, int level) {
 		int n = a.length;
 		if (n == 1) {
 			if (echo >= 3) {
@@ -18,9 +18,11 @@ public class FFT {
 		}
 		
 		Complex e = new Complex(Math.E);
-		Complex principal = e.pow(Complex.I.multiply(2*Math.PI/n));
+		Complex principal = e.pow(Complex.I.multiply(2*Math.PI/n)).conjugate();
 		principal = Tools.round(principal, 10);
 		Complex omega = new Complex(1);
+		if (inverse)
+			principal = principal.pow(-1);
 		
 		int halfUp = (int)Math.ceil((double)n/2);
 		int halfDown = n/2;
@@ -38,13 +40,31 @@ public class FFT {
 		}
 		
 		// recursive calls
-		Complex[] y0 = fft(a0, level + 1);
-		Complex[] y1 = fft(a1, level + 1);
+		Complex[] y0 = fft(a0, inverse, level + 1);
+		Complex[] y1 = fft(a1, inverse, level + 1);
 		
+		// combine y0 and y1 back into a single vector
 		Complex[] y = new Complex[n];
+		//System.out.println(halfDown+" / "+n);
 		for (int k = 0; k < halfDown; k++) {
-			y[k] = y0[k].add(omega.multiply(y1[k]));	// it's probably not OK to get the real value here
+			omega = Tools.round(omega, 5);
+			if (echo >= 5) {
+				double kth = -2 * k * Math.PI / n;
+	            Complex wk = Tools.round(new Complex(Math.cos(kth), Math.sin(kth)),5);
+	            System.out.println("CHECK: "+wk+" vs "+omega);
+			}
+			
+			y[k] 			= y0[k].add(omega.multiply(y1[k]));
 			y[k + halfDown] = y0[k].subtract(omega.multiply(y1[k]));
+			if (inverse) {
+				if (n == 4) {
+					System.out.println(y[k]+" --> "+y[k].divide(halfDown));
+					System.out.println(y[k + halfDown]+" ==> "+y[k + halfDown].divide(halfDown));
+				}
+				y[k] = y[k].divide(n);
+				y[k + halfDown] = y[k + halfDown].divide(n);
+			}
+			
 			omega = omega.multiply(principal);
 		}
 		
@@ -53,32 +73,70 @@ public class FFT {
 			Tools.printVector(y);
 		}
 		
+		// y is assumed to be a column vector
 		return y;
 	}
 	
-	public static double[] transform(double[] vector) {
+	private static Complex[] invfft(Complex[] x) {
+		int N = x.length;
+        Complex[] y = new Complex[N];
+
+        // take conjugate
+        for (int i = 0; i < N; i++) {
+            y[i] = x[i].conjugate();
+        }
+
+        // compute forward FFT
+        y = fft(y, false, 0);
+
+        // take conjugate again
+        for (int i = 0; i < N; i++) {
+            y[i] = y[i].conjugate();
+        }
+
+        // divide by N
+        for (int i = 0; i < N; i++) {
+            y[i] = y[i].multiply(1.0 / N);
+        }
+
+        return y;
+	}
+	
+	private static Complex[] transform(Complex[] vector, boolean inverse) {
 		
-		// find the smallest power of two that will contain this vector
+		// find the smallest power of two that will contain the resulting vector
 		int exp = 1;
+		//while (Math.pow(2, exp) < vector.length * 2)
 		while (Math.pow(2, exp) < vector.length)
 			exp++;
 		// pad the vector with zeros
-		double[] a = new double[(int)Math.pow(2, exp)];
+		Complex[] a = new Complex[(int)Math.pow(2, exp)];
 		for (int i = 0; i < vector.length; i++) {
 			a[a.length - vector.length + i] = vector[i];
 		}
 		
-		return Tools.toDouble(fft(Tools.toComplex(a), 0));
+		if (echo == 2)
+			Tools.printVector(a);
+		
+		return fft(a, inverse, 0);
 	}
 	
-	public static int[] transform(int[] vector) {
+	public static Complex[] transform(double[] vector) {
+		return transform(Tools.toComplex(vector), false);
+	}
+	
+	public static double[] inverse(Complex[] vector) {
+		double[] inv = Tools.toDouble(transform(vector, true));
+		for (int i = 0; i < vector.length; i++)
+			inv[i] *= 2;
+		return inv;
+	}
+	
+	public static Complex[] transform(int[] vector) {
 		double[] a = new double[vector.length];
 		for (int i = 0; i < vector.length; i++)
 			a[i] = vector[i];
-		a = transform(a);
-		for (int i = 0; i < vector.length; i++)
-			vector[i] = (int) a[i];
-		return vector;
+		return transform(a);
 	}
 	
 }

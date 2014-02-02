@@ -57,8 +57,11 @@ public class Tools {
 	
 	public static double[] toDouble(Complex[] vector) {
 		double[] primitive = new double[vector.length];
-		for (int i = 0; i < vector.length; i++)
+		for (int i = 0; i < vector.length; i++) {
 			primitive[i] = vector[i].getReal();
+			if (vector[i].getImaginary() != 0.0)
+				System.out.println("WARNING: complex component "+vector[i].getImaginary()+" is being discarded!");
+		}
 		return primitive;
 	}
 	
