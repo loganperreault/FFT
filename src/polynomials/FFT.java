@@ -7,6 +7,7 @@ public class FFT {
 	private static int padding = 4;
 	private static int echo = 1;
 	
+	// BUG: inverse fft does not work (I think it's when there is an imaginary componenet to some of the elements)
 	private static Complex[] fft(Complex[] a, boolean inverse, int level) {
 		int n = a.length;
 		if (n == 1) {
@@ -48,11 +49,15 @@ public class FFT {
 		//System.out.println(halfDown+" / "+n);
 		for (int k = 0; k < halfDown; k++) {
 			omega = Tools.round(omega, 5);
+			
+			double kth = -2 * k * Math.PI / n;
+            Complex wk = Tools.round(new Complex(Math.cos(kth), Math.sin(kth)),5);
 			if (echo >= 5) {
-				double kth = -2 * k * Math.PI / n;
-	            Complex wk = Tools.round(new Complex(Math.cos(kth), Math.sin(kth)),5);
 	            System.out.println("CHECK: "+wk+" vs "+omega);
 			}
+			
+			// TODO: remove
+			//omega = wk;
 			
 			y[k] 			= y0[k].add(omega.multiply(y1[k]));
 			y[k + halfDown] = y0[k].subtract(omega.multiply(y1[k]));
@@ -103,27 +108,6 @@ public class FFT {
 	}
 	
 	private static Complex[] transform(Complex[] vector, boolean inverse) {
-		
-		/*
-		// find the smallest power of two that will contain the resulting vector
-		int exp = 1;
-		//while (Math.pow(2, exp) < vector.length * 2)
-		while (Math.pow(2, exp) < vector.length)
-			exp++;
-		// pad the vector with zeros
-		Complex[] a = new Complex[(int)Math.pow(2, exp)];
-		for (int i = 0; i < a.length; i++) {
-			if (i < a.length - vector.length)
-				a[i] = new Complex(0);
-			else
-				a[i] = vector[a.length - i - 1];
-		}
-		Tools.printVector(a);
-		
-		if (echo == 2)
-			Tools.printVector(a);
-		*/
-		
 		return fft(vector, inverse, 0);
 	}
 	
@@ -132,9 +116,9 @@ public class FFT {
 	}
 	
 	public static double[] inverse(Complex[] vector) {
-		double[] inv = Tools.toDouble(transform(vector, true));
-		for (int i = 0; i < vector.length; i++)
-			inv[i] *= 2;
+		// BUG: The modified transform does not give an inverse fft
+		//double[] inv = Tools.toDouble(transform(vector, true));
+		double[] inv = Tools.toDouble(invfft(vector), 3);
 		return inv;
 	}
 	

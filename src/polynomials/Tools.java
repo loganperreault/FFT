@@ -55,14 +55,21 @@ public class Tools {
 		return complex;
 	}
 	
-	public static double[] toDouble(Complex[] vector) {
+	public static double[] toDouble(Complex[] vector, int precision) {
 		double[] primitive = new double[vector.length];
 		for (int i = 0; i < vector.length; i++) {
-			primitive[i] = vector[i].getReal();
+			if (precision > 0)
+				primitive[i] = round(vector[i].getReal(), precision);
+			else
+				primitive[i] = vector[i].getReal();
 			if (vector[i].getImaginary() != 0.0)
 				System.out.println("WARNING: complex component "+vector[i].getImaginary()+" is being discarded!");
 		}
 		return primitive;
+	}
+	
+	public static double[] toDouble(Complex[] vector) {
+		return toDouble(vector, 0);
 	}
 	
 	public static int[] toInteger(Complex[] vector) {
@@ -72,11 +79,19 @@ public class Tools {
 		return primitive;
 	}
 	
-	public static double[] toDouble(int[] vector) {
+	public static double[] toDouble(int[] vector, int precision) {
 		double[] primitive = new double[vector.length];
-		for (int i = 0; i < vector.length; i++)
-			primitive[i] = vector[i];
+		for (int i = 0; i < vector.length; i++) {
+			if (precision > 0)
+				primitive[i] = round(vector[i], precision);
+			else
+				primitive[i] = vector[i];
+		}
 		return primitive;
+	}
+	
+	public static double[] toDouble(int[] vector) {
+		return toDouble(vector, 0);
 	}
 	
 	public static int[] toInteger(double[] vector) {
@@ -84,6 +99,17 @@ public class Tools {
 		for (int i = 0; i < vector.length; i++)
 			primitive[i] = (int) vector[i];
 		return primitive;
+	}
+	
+	public static boolean compare(double a, double b, double margin) {
+		if (a >= ( b - margin ) && a <= ( b + margin ))
+			return true;
+		else
+			return false;
+	}
+	
+	public static boolean compare(double a, double b) {
+		return compare(a, b, 0.0000001);
 	}
 	
 }
