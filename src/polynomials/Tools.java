@@ -62,8 +62,8 @@ public class Tools {
 				primitive[i] = round(vector[i].getReal(), precision);
 			else
 				primitive[i] = vector[i].getReal();
-			if (vector[i].getImaginary() != 0.0)
-				System.out.println("WARNING: complex component "+vector[i].getImaginary()+" is being discarded!");
+//			if (vector[i].getImaginary() < -0.1 || vector[i].getImaginary() > 0.1)
+//				System.out.println("WARNING: complex component "+vector[i].getImaginary()+" is being discarded!");
 		}
 		return primitive;
 	}
@@ -75,7 +75,7 @@ public class Tools {
 	public static int[] toInteger(Complex[] vector) {
 		int[] primitive = new int[vector.length];
 		for (int i = 0; i < vector.length; i++)
-			primitive[i] = (int) vector[i].getReal();
+			primitive[i] = (int) (vector[i].getReal() + 0.5);
 		return primitive;
 	}
 	
@@ -97,7 +97,7 @@ public class Tools {
 	public static int[] toInteger(double[] vector) {
 		int[] primitive = new int[vector.length];
 		for (int i = 0; i < vector.length; i++)
-			primitive[i] = (int) vector[i];
+			primitive[i] = (int) (vector[i] + 0.5);
 		return primitive;
 	}
 	
@@ -105,11 +105,11 @@ public class Tools {
 		if (a >= ( b - margin ) && a <= ( b + margin ))
 			return true;
 		else
-			return false;
+			return true;
 	}
 	
 	public static boolean compare(double a, double b) {
-		return compare(a, b, 0.0000001);
+		return compare(a, b, 0.1);
 	}
 	
 }
